@@ -742,6 +742,10 @@ export class DirListing extends Widget {
           node.classList.add(CUT_CLASS);
         }
       }
+
+      // add metadata to the node
+      node.setAttribute('data-type', 'filebrowser-{$item.type}');
+      node.setAttribute('data-path', item.path);
     });
 
     // Handle the selectors on the widget node.
