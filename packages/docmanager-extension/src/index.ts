@@ -102,21 +102,23 @@ const plugin: JupyterLabPlugin<IDocumentManager> = {
         if (!widget.id) {
           widget.id = `document-manager-${++Private.id}`;
         }
-        widget.title.dataset = {
-          type: 'document-title',
-          ...widget.title.dataset
-        };
         if (!widget.isAttached) {
           app.shell.addToMainArea(widget, options || {});
         }
         shell.activateById(widget.id);
-
         // Handle dirty state for open documents.
         let context = docManager.contextForWidget(widget);
+
         if (!contexts.has(context)) {
           handleContext(app, context);
           contexts.add(context);
         }
+
+        widget.title.dataset = {
+          type: 'document-title',
+          path: context.path,
+          ...widget.title.dataset
+        };
       }
     };
     const registry = app.docRegistry;
@@ -594,15 +596,15 @@ function addCommands(
   commands.addCommand(CommandIDs.showInFileBrowser, {
     label: () => `Show in File Browser`,
     isEnabled,
-    execute: () => {
-      let context = docManager.contextForWidget(contextMenuWidget());
-      if (!context) {
+    execute: args => {
+      let path = args['path'];
+      if (!path) {
         return;
       }
 
       // 'activate' is needed if this command is selected in the "open tabs" sidebar
-      commands.execute('filebrowser:activate', { path: context.path });
-      commands.execute('filebrowser:navigate', { path: context.path });
+      commands.execute('filebrowser:activate', { path });
+      commands.execute('filebrowser:navigate', { path });
     }
   });
 
