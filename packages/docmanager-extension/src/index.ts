@@ -634,6 +634,7 @@ function addCommands(
   });
   app.contextMenu.addItem({
     command: CommandIDs.showInFileBrowser,
+    passDataset: true,
     selector: '[data-type="document-title"]',
     rank: 3
   });
