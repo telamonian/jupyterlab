@@ -596,8 +596,17 @@ function addCommands(
   commands.addCommand(CommandIDs.showInFileBrowser, {
     label: () => `Show in File Browser`,
     isEnabled,
-    execute: args => {
+    execute: (args, target) => {
+      // give 1st precedence to explicitly passed path
       let path = args['path'];
+      if (!path && target) {
+        // give 2nd precedence to path on the target node, if present
+        path = target.dataset['path'];
+      }
+      if (!path) {
+        // fall back to path of focused widget
+        path = docManager.contextForWidget(shell.currentWidget).path;
+      }
       if (!path) {
         return;
       }
@@ -634,7 +643,6 @@ function addCommands(
   });
   app.contextMenu.addItem({
     command: CommandIDs.showInFileBrowser,
-    passDataset: true,
     selector: '[data-type="document-title"]',
     rank: 3
   });
