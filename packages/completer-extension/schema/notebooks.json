@@ -6,6 +6,16 @@
       "command": "completer:invoke-notebook",
       "keys": ["Tab"],
       "selector": ".jp-Notebook.jp-mod-editMode .jp-mod-completer-enabled"
+    },
+    {
+      "command": "completer:cycle-notebook",
+      "keys": ["Tab"],
+      "selector": ".jp-Completer.jp-HoverBox:not(.p-mod-hidden)"
+    },
+    {
+      "command": "completer:select-notebook",
+      "keys": ["Enter"],
+      "selector": ".jp-Completer.jp-HoverBox:not(.p-mod-hidden)"
     }
   ],
   "properties": {},

@@ -6,6 +6,16 @@
       "command": "completer:invoke-console",
       "keys": ["Tab"],
       "selector": ".jp-CodeConsole-promptCell .jp-mod-completer-enabled"
+    },
+    {
+      "command": "completer:cycle-console",
+      "keys": ["Tab"],
+      "selector": ".jp-ConsolePanel jp-mod-completer-active"
+    },
+    {
+      "command": "completer:select-console",
+      "keys": ["Enter"],
+      "selector": ".jp-ConsolePanel .jp-mod-completer-active"
     }
   ],
   "properties": {},

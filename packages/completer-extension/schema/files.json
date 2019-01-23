@@ -6,6 +6,16 @@
       "command": "completer:invoke-file",
       "keys": ["Tab"],
       "selector": ".jp-FileEditor .jp-mod-completer-enabled"
+    },
+    {
+      "command": "completer:cycle-file",
+      "keys": ["Tab"],
+      "selector": ".jp-FileEditor .jp-mod-completer-active"
+    },
+    {
+      "command": "completer:select-file",
+      "keys": ["Enter"],
+      "selector": ".jp-FileEditor .jp-mod-completer-active"
     }
   ],
   "properties": {},

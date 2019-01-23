@@ -36,6 +36,14 @@ namespace CommandIDs {
 
   export const invokeFile = 'completer:invoke-file';
 
+  export const cycle = 'completer:cycle';
+
+  export const cycleConsole = 'completer:cycle-console';
+
+  export const cycleNotebook = 'completer:cycle-notebook';
+
+  export const cycleFile = 'completer:cycle-file';
+
   export const select = 'completer:select';
 
   export const selectConsole = 'completer:select-console';
@@ -65,6 +73,21 @@ const manager: JupyterLabPlugin<ICompletionManager> = {
         const handler = handlers[id];
         if (handler) {
           handler.invoke();
+        }
+      }
+    });
+
+    app.commands.addCommand(CommandIDs.cycle, {
+      execute: args => {
+        let id = args && (args['id'] as string);
+        let direction = args && (args['direction'] as string);
+        if (!id) {
+          return;
+        }
+
+        const handler = handlers[id];
+        if (handler) {
+          handler.completer.loop(direction === 'up' ? 'up' : 'down');
         }
       }
     });
@@ -160,6 +183,16 @@ const consoles: JupyterLabPlugin<void> = {
       }
     });
 
+    // Add console completer cycle command.
+    app.commands.addCommand(CommandIDs.cycleConsole, {
+      execute: () => {
+        const id = consoles.currentWidget && consoles.currentWidget.id;
+        if (id) {
+          return app.commands.execute(CommandIDs.cycle, { id });
+        }
+      }
+    });
+
     // Add console completer select command.
     app.commands.addCommand(CommandIDs.selectConsole, {
       execute: () => {
@@ -169,13 +202,6 @@ const consoles: JupyterLabPlugin<void> = {
           return app.commands.execute(CommandIDs.select, { id });
         }
       }
-    });
-
-    // Set enter key for console completer select command.
-    app.commands.addKeyBinding({
-      command: CommandIDs.selectConsole,
-      keys: ['Enter'],
-      selector: `.jp-ConsolePanel .jp-mod-completer-active`
     });
   }
 };
@@ -220,6 +246,17 @@ const notebooks: JupyterLabPlugin<void> = {
     });
 
     // Add notebook completer select command.
+    app.commands.addCommand(CommandIDs.cycleNotebook, {
+      execute: () => {
+        const id = notebooks.currentWidget && notebooks.currentWidget.id;
+
+        if (id) {
+          return app.commands.execute(CommandIDs.cycle, { id });
+        }
+      }
+    });
+
+    // Add notebook completer select command.
     app.commands.addCommand(CommandIDs.selectNotebook, {
       execute: () => {
         const id = notebooks.currentWidget && notebooks.currentWidget.id;
@@ -228,13 +265,6 @@ const notebooks: JupyterLabPlugin<void> = {
           return app.commands.execute(CommandIDs.select, { id });
         }
       }
-    });
-
-    // Set enter key for notebook completer select command.
-    app.commands.addKeyBinding({
-      command: CommandIDs.selectNotebook,
-      keys: ['Enter'],
-      selector: `.jp-Notebook .jp-mod-completer-active`
     });
   }
 };
@@ -324,7 +354,7 @@ const files: JupyterLabPlugin<void> = {
       });
     });
 
-    // Add console completer invoke command.
+    // Add file completer invoke command.
     app.commands.addCommand(CommandIDs.invokeFile, {
       execute: () => {
         const id =
@@ -336,7 +366,19 @@ const files: JupyterLabPlugin<void> = {
       }
     });
 
-    // Add console completer select command.
+    // Add file completer cycle command.
+    app.commands.addCommand(CommandIDs.cycleFile, {
+      execute: () => {
+        const id =
+          editorTracker.currentWidget && editorTracker.currentWidget.id;
+
+        if (id) {
+          return app.commands.execute(CommandIDs.cycle, { id });
+        }
+      }
+    });
+
+    // Add file completer select command.
     app.commands.addCommand(CommandIDs.selectFile, {
       execute: () => {
         const id =
@@ -346,13 +388,6 @@ const files: JupyterLabPlugin<void> = {
           return app.commands.execute(CommandIDs.select, { id });
         }
       }
-    });
-
-    // Set enter key for console completer select command.
-    app.commands.addKeyBinding({
-      command: CommandIDs.selectFile,
-      keys: ['Enter'],
-      selector: `.jp-FileEditor .jp-mod-completer-active`
     });
   }
 };

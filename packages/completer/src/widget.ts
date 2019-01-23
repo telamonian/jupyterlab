@@ -182,6 +182,24 @@ export class Completer extends Widget {
   }
 
   /**
+   * Cycle endlessly through the available completer items.
+   */
+  loop(direction: 'up' | 'down'): void {
+    let items = this.node.querySelectorAll(`.${ITEM_CLASS}`);
+    let index = this._activeIndex;
+    let active = this.node.querySelector(`.${ACTIVE_CLASS}`) as HTMLElement;
+    active.classList.remove(ACTIVE_CLASS);
+    if (direction === 'up') {
+      this._activeIndex = index === 0 ? items.length : index - 1;
+    } else {
+      this._activeIndex = index < items.length - 1 ? index + 1 : 0;
+    }
+    active = items[this._activeIndex] as HTMLElement;
+    active.classList.add(ACTIVE_CLASS);
+    ElementExt.scrollIntoViewIfNeeded(this.node, active);
+  }
+
+  /**
    * Handle `after-attach` messages for the widget.
    */
   protected onAfterAttach(msg: Message): void {
@@ -296,7 +314,7 @@ export class Completer extends Widget {
    * #### Notes
    * When the user cycles all the way `down` to the last index, subsequent
    * `down` cycles will remain on the last index. When the user cycles `up` to
-   * the first item, subsequent `up` cycles will remain on the first cycle.
+   * the first item, subsequent `up` cycles will remain on the first index.
    */
   private _cycle(direction: 'up' | 'down'): void {
     let items = this.node.querySelectorAll(`.${ITEM_CLASS}`);
@@ -325,22 +343,22 @@ export class Completer extends Widget {
       return;
     }
     switch (event.keyCode) {
-      case 9: // Tab key
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        let model = this._model;
-        if (!model) {
-          return;
-        }
-        model.subsetMatch = true;
-        let populated = this._populateSubset();
-        model.subsetMatch = false;
-        if (populated) {
-          return;
-        }
-        this.selectActive();
-        return;
+      // case 9: // Tab key
+      //   event.preventDefault();
+      //   event.stopPropagation();
+      //   event.stopImmediatePropagation();
+      //   let model = this._model;
+      //   if (!model) {
+      //     return;
+      //   }
+      //   model.subsetMatch = true;
+      //   let populated = this._populateSubset();
+      //   model.subsetMatch = false;
+      //   if (populated) {
+      //     return;
+      //   }
+      //   this.selectActive();
+      //   return;
       case 27: // Esc key
         event.preventDefault();
         event.stopPropagation();
