@@ -45,7 +45,8 @@ class BrowserApp(LabApp):
         web_app.settings['page_config_data']['buildAvailable'] = False
 
         pool = ThreadPoolExecutor()
-        future = pool.submit(run_browser, self.display_url)
+        url = self.display_url.splitlines()[0]
+        future = pool.submit(run_browser, url)
         IOLoop.current().add_future(future, self._browser_finished)
         super(BrowserApp, self).start()
 
