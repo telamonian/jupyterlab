@@ -176,7 +176,7 @@ class OpenDirectWidget extends Widget {
  */
 export function getOpenPath(contentsManager: any): Promise<string | undefined> {
   return showDialog({
-    title: 'Open File',
+    title: 'Open File or Directory',
     body: new OpenDirectWidget(),
     buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'OPEN' })],
     focusNodeSelector: 'input'

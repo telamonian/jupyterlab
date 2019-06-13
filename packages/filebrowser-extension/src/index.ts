@@ -429,8 +429,10 @@ function addCommands(
     execute: args => {
       const path = (args.path as string) || '';
       return Private.navigateToPath(path, factory)
-        .then(() => {
-          return commands.execute('docmanager:open', { path });
+        .then(model => {
+          return model.type === 'directory'
+            ? null
+            : commands.execute('docmanager:open', { path });
         })
         .catch((reason: any) => {
           console.warn(
@@ -865,7 +867,7 @@ namespace Private {
   export function navigateToPath(
     path: string,
     factory: IFileBrowserFactory
-  ): Promise<any> {
+  ): Promise<Contents.IModel> {
     const browserForPath = Private.getBrowserForPath(path, factory);
     const { services } = browserForPath.model.manager;
     const localPath = services.contents.localPath(path);
@@ -877,10 +879,16 @@ namespace Private {
         const { restored } = model;
 
         if (value.type === 'directory') {
-          return restored.then(() => model.cd(`/${localPath}`));
+          return restored.then(() => {
+            model.cd(`/${localPath}`);
+            return value;
+          });
         }
 
-        return restored.then(() => model.cd(`/${PathExt.dirname(localPath)}`));
+        return restored.then(() => {
+          model.cd(`/${PathExt.dirname(localPath)}`);
+          return value;
+        });
       });
   }
 }
