@@ -70,6 +70,11 @@ export interface IClientSession extends IDisposable {
    */
   readonly kernel: Kernel.IKernelConnection | null;
 
+  // /**
+  //  * Asyncronous fetch/lazy loading of the kernel.
+  //  */
+  // readonly kernelLazy: Promise<Kernel.IKernelConnection>;
+
   /**
    * The current path associated with the client session.
    */
@@ -126,8 +131,12 @@ export interface IClientSession extends IDisposable {
 
   /**
    * Select a kernel for the session.
+   *
+   * @param forceStart: if true, select a kernel if kernelPreference.canStart
+   * is true. Normally, no kernel is selected if either of
+   * kernelPreference.{canStart, shouldStart} are false.
    */
-  selectKernel(): Promise<void>;
+  selectKernel(forceStart?: boolean): Promise<void>;
 
   /**
    * Restart the session.
@@ -224,7 +233,11 @@ export class ClientSession implements IClientSession {
     this._type = options.type || '';
     this._name = options.name || '';
     this._setBusy = options.setBusy;
-    this._kernelPreference = options.kernelPreference || {};
+    this._kernelPreference = {
+      ...options.kernelPreference,
+      canStart: true,
+      shouldStart: false
+    };
   }
 
   /**
@@ -275,6 +288,21 @@ export class ClientSession implements IClientSession {
   get kernel(): Kernel.IKernelConnection | null {
     return this._session ? this._session.kernel : null;
   }
+
+  // /**
+  //  * A promise that will resolve to the current kernel of the session.
+  //  * If there isn't one, will lazily load the kernel if possible.
+  //  */
+  // get kernelLazy(): Promise<Kernel.IKernelConnection> {
+  //   if (this._session) {
+  //     if (!this._session.kernel && this._kernelPreference.canStart === true) {
+  //       this.selectKernel(true).then(() => undefined);
+  //     }
+  //
+  //     return this._session.kernel || null;
+  //   }
+  //   return null;
+  // }
 
   /**
    * The current path of the session.
@@ -333,7 +361,14 @@ export class ClientSession implements IClientSession {
    * A promise that is fulfilled when the session is ready.
    */
   get ready(): Promise<void> {
-    return this._ready.promise;
+    return this._ready.promise.then(
+      (): Promise<void> => {
+        const { canStart, shouldStart } = this.kernelPreference;
+        if (!this.kernel && canStart === true && shouldStart === false) {
+          return this.initialize(true);
+        }
+      }
+    );
   }
 
   /**
@@ -518,8 +553,13 @@ export class ClientSession implements IClientSession {
    * If a default kernel is available, we connect to it.
    * Otherwise we ask the user to select a kernel.
    */
-  async initialize(): Promise<void> {
+  async initialize(forceStart?: boolean): Promise<void> {
     if (this._initializing || this._isReady) {
+      if (forceStart) {
+        await this._ready.promise;
+        await this._startIfNecessary(forceStart);
+        return;
+      }
       return this._ready.promise;
     }
     this._initializing = true;
@@ -537,7 +577,7 @@ export class ClientSession implements IClientSession {
         return Promise.reject(err);
       }
     }
-    await this._startIfNecessary();
+    await this._startIfNecessary(forceStart);
     this._isReady = true;
     this._ready.resolve(undefined);
   }
@@ -545,13 +585,13 @@ export class ClientSession implements IClientSession {
   /**
    * Start the session if necessary.
    */
-  private _startIfNecessary(): Promise<void> {
+  private _startIfNecessary(forceStart?: boolean): Promise<void> {
     let preference = this.kernelPreference;
     if (
       this.isDisposed ||
       this.kernel ||
-      preference.shouldStart === false ||
-      preference.canStart === false
+      preference.canStart === false ||
+      (preference.shouldStart === false && forceStart !== true)
     ) {
       return Promise.resolve();
     }
@@ -1002,15 +1042,9 @@ namespace Private {
     options: ClientSession.IKernelSearch
   ): string | null {
     let { specs, preference } = options;
-    let {
-      name,
-      language,
-      shouldStart,
-      canStart,
-      autoStartDefault
-    } = preference;
+    let { name, language, canStart, autoStartDefault } = preference;
 
-    if (!specs || shouldStart === false || canStart === false) {
+    if (!specs || canStart === false) {
       return null;
     }
 
