@@ -89,7 +89,7 @@ describe('@jupyterlab/notebook', () => {
         expect(model.cells.get(0)).to.equal(cell); // should be ===.
       });
 
-      context('cells `changed` signal', () => {
+      describe('cells `changed` signal', () => {
         it('should emit a `contentChanged` signal upon cell addition', () => {
           const model = new NotebookModel();
           const cell = model.contentFactory.createCodeCell({});
@@ -348,7 +348,7 @@ describe('@jupyterlab/notebook', () => {
     describe('.ContentFactory', () => {
       let factory = new NotebookModel.ContentFactory({});
 
-      context('#codeCellContentFactory', () => {
+      describe('#codeCellContentFactory', () => {
         it('should be a code cell content factory', () => {
           expect(factory.codeCellContentFactory).to.equal(
             CodeCellModel.defaultContentFactory
@@ -366,7 +366,7 @@ describe('@jupyterlab/notebook', () => {
         });
       });
 
-      context('#createCell()', () => {
+      describe('#createCell()', () => {
         it('should create a new code cell', () => {
           const cell = factory.createCell('code', {});
           expect(cell.type).to.equal('code');
@@ -383,7 +383,7 @@ describe('@jupyterlab/notebook', () => {
         });
       });
 
-      context('#createCodeCell()', () => {
+      describe('#createCodeCell()', () => {
         it('should create a new code cell', () => {
           const cell = factory.createCodeCell({});
           expect(cell.type).to.equal('code');
@@ -406,7 +406,7 @@ describe('@jupyterlab/notebook', () => {
         });
       });
 
-      context('#createRawCell()', () => {
+      describe('#createRawCell()', () => {
         it('should create a new raw cell', () => {
           const cell = factory.createRawCell({});
           expect(cell.type).to.equal('raw');

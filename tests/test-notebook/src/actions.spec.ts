@@ -9,11 +9,7 @@ import { each } from '@phosphor/algorithm';
 
 import { CodeCell, MarkdownCell, RawCell } from '@jupyterlab/cells';
 
-import { NotebookModel } from '@jupyterlab/notebook';
-
-import { NotebookActions } from '@jupyterlab/notebook';
-
-import { Notebook } from '@jupyterlab/notebook';
+import { Notebook, NotebookActions, NotebookModel } from '@jupyterlab/notebook';
 
 import {
   acceptDialog,
@@ -31,12 +27,16 @@ const JUPYTER_CELL_MIME = 'application/vnd.jupyter.cells';
 describe('@jupyterlab/notebook', () => {
   const rendermime = NBTestUtils.defaultRenderMime();
 
+  beforeAll(() => {
+    jest.setTimeout(60000); // Allow for slower CI
+  });
+
   describe('NotebookActions', () => {
     let widget: Notebook;
     let session: ClientSession;
     let ipySession: ClientSession;
 
-    before(async () => {
+    beforeAll(async () => {
       session = await createClientSession();
       ipySession = await createClientSession({
         kernelPreference: { name: 'ipython' }
@@ -63,7 +63,7 @@ describe('@jupyterlab/notebook', () => {
       NBTestUtils.clipboard.clear();
     });
 
-    after(() => {
+    afterAll(() => {
       return Promise.all([session.shutdown(), ipySession.shutdown()]);
     });
 
@@ -540,7 +540,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(false);
         expect(cell.executionCount).to.be.null;
         await ipySession.kernel.restart();
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should render all markdown cells on an error', async () => {
         const cell = widget.model.contentFactory.createMarkdownCell({});
@@ -557,7 +557,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(false);
         expect(child.rendered).to.equal(true);
         await ipySession.kernel.restart();
-      }).timeout(60000); // Allow for slower CI
+      }); // This test may need a long timeout
     });
 
     describe('#runAndAdvance()', () => {
@@ -571,7 +571,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(true);
         expect(cell.model.outputs.length).to.be.above(0);
         expect(next.rendered).to.equal(true);
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should be a no-op if there is no model', async () => {
         widget.model = null;
@@ -586,7 +586,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(false);
         expect(widget.isSelected(widget.widgets[0])).to.equal(false);
         await ipySession.kernel.restart();
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should change to command mode', async () => {
         widget.mode = 'edit';
@@ -631,7 +631,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(false);
         expect(cell.executionCount).to.be.null;
         await ipySession.kernel.restart();
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should render all markdown cells on an error', async () => {
         widget.activeCell.model.value.text = ERROR_INPUT;
@@ -647,7 +647,7 @@ describe('@jupyterlab/notebook', () => {
         expect(cell.rendered).to.equal(true);
         expect(widget.activeCellIndex).to.equal(2);
         await ipySession.kernel.restart();
-      }).timeout(60000); // Allow for slower CI
+      }); // This test may need a long timeout
     });
 
     describe('#runAndInsert()', () => {
@@ -709,7 +709,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(false);
         expect(cell.executionCount).to.be.null;
         await ipySession.kernel.restart();
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should render all markdown cells on an error', async () => {
         widget.activeCell.model.value.text = ERROR_INPUT;
@@ -725,7 +725,7 @@ describe('@jupyterlab/notebook', () => {
         expect(cell.rendered).to.equal(true);
         expect(widget.activeCellIndex).to.equal(2);
         await ipySession.kernel.restart();
-      }).timeout(60000); // Allow for slower CI
+      }); // This test may need a long timeout
     });
 
     describe('#runAll()', () => {
@@ -743,7 +743,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(true);
         expect(cell.model.outputs.length).to.be.above(0);
         expect(next.rendered).to.equal(true);
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should be a no-op if there is no model', async () => {
         widget.model = null;
@@ -756,7 +756,7 @@ describe('@jupyterlab/notebook', () => {
         const result = await NotebookActions.runAll(widget, session);
         expect(result).to.equal(true);
         expect(widget.mode).to.equal('command');
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should clear the existing selection', async () => {
         const next = widget.widgets[2];
@@ -764,12 +764,12 @@ describe('@jupyterlab/notebook', () => {
         const result = await NotebookActions.runAll(widget, session);
         expect(result).to.equal(true);
         expect(widget.isSelected(widget.widgets[2])).to.equal(false);
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should activate the last cell', async () => {
         await NotebookActions.runAll(widget, session);
         expect(widget.activeCellIndex).to.equal(widget.widgets.length - 1);
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should stop executing code cells on an error', async () => {
         widget.activeCell.model.value.text = ERROR_INPUT;
@@ -780,7 +780,7 @@ describe('@jupyterlab/notebook', () => {
         expect(cell.executionCount).to.be.null;
         expect(widget.activeCellIndex).to.equal(widget.widgets.length - 1);
         await ipySession.kernel.restart();
-      }).timeout(30000); // Allow for slower CI
+      }); // This test may need a long timeout
 
       it('should render all markdown cells on an error', async () => {
         widget.activeCell.model.value.text = ERROR_INPUT;
@@ -794,7 +794,7 @@ describe('@jupyterlab/notebook', () => {
         expect(result).to.equal(false);
         expect(cell.rendered).to.equal(true);
         await ipySession.kernel.restart();
-      }).timeout(60000); // Allow for slower CI
+      }); // This test may need a long timeout
     });
 
     describe('#selectAbove()', () => {

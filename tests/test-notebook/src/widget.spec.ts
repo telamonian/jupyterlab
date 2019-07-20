@@ -286,7 +286,7 @@ describe('@jupyter/notebook', () => {
         expect(child.model.mimeType).to.equal('text/x-python');
       });
 
-      context('`cells.changed` signal', () => {
+      describe('`cells.changed` signal', () => {
         let widget: LogStaticNotebook;
 
         beforeEach(() => {
@@ -1140,7 +1140,7 @@ describe('@jupyter/notebook', () => {
         widget.dispose();
       });
 
-      context('mousedown', () => {
+      describe('mousedown', () => {
         it('should set the active cell index', () => {
           const child = widget.widgets[1];
           simulate(child.node, 'mousedown');
@@ -1265,7 +1265,7 @@ describe('@jupyter/notebook', () => {
         });
       });
 
-      context('dblclick', () => {
+      describe('dblclick', () => {
         it('should unrender a markdown cell', () => {
           const cell = widget.model.contentFactory.createMarkdownCell({});
           cell.value.text = '# Hello'; // Should be rendered with content.
@@ -1281,7 +1281,7 @@ describe('@jupyter/notebook', () => {
         });
       });
 
-      context('focusin', () => {
+      describe('focusin', () => {
         it('should change to edit mode if a child cell takes focus', () => {
           const child = widget.widgets[0];
           simulate(child.editorWidget.node, 'focusin');
@@ -1301,7 +1301,7 @@ describe('@jupyter/notebook', () => {
         });
       });
 
-      context('focusout', () => {
+      describe('focusout', () => {
         it('should switch to command mode', () => {
           simulate(widget.node, 'focusin');
           widget.mode = 'edit';
@@ -1457,7 +1457,7 @@ describe('@jupyter/notebook', () => {
         expect(widget.activeCell).to.equal(widget.widgets[2]);
       });
 
-      context('`edgeRequested` signal', () => {
+      describe('`edgeRequested` signal', () => {
         it('should activate the previous cell if top is requested', () => {
           const widget = createActiveWidget();
           widget.model.fromJSON(NBTestUtils.DEFAULT_CONTENT);

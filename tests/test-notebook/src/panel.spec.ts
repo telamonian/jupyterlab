@@ -3,11 +3,11 @@
 
 import { expect } from 'chai';
 
+import { Toolbar } from '@jupyterlab/apputils';
+
 import { Context } from '@jupyterlab/docregistry';
 
 import { INotebookModel, NotebookPanel, Notebook } from '@jupyterlab/notebook';
-
-import { Toolbar } from '@jupyterlab/apputils';
 
 import { initNotebookContext, NBTestUtils } from '@jupyterlab/testutils';
 

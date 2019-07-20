@@ -5,9 +5,7 @@ import { expect } from 'chai';
 
 import { CodeCellModel } from '@jupyterlab/cells';
 
-import { NotebookModel } from '@jupyterlab/notebook';
-
-import { NotebookModelFactory } from '@jupyterlab/notebook';
+import { NotebookModel, NotebookModelFactory } from '@jupyterlab/notebook';
 
 describe('@jupyterlab/notebook', () => {
   describe('NotebookModelFactory', () => {

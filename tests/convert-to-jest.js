@@ -23,34 +23,15 @@ if (!fs.existsSync(testSrc)) {
 
 const name = target.replace('test-', '');
 
-// Update the test files
-glob.sync(path.join(testSrc, 'src', '**', '*.ts*')).forEach(function(filePath) {
-  console.log(filePath); // eslint-disable-line
-  // Convert test files to use jest
-  let src = fs.readFileSync(filePath, 'utf8');
-  src = src.split('before(').join('beforeAll(');
-  src = src.split('context(').join('describe(');
-  src = src.split('after(').join('afterAll(');
-
-  // Use imports from /src
-  src = src.split(`'@jupyterlab/${name}';`).join(`'@jupyterlab/${name}/src';`);
-
-  fs.writeFileSync(filePath, src, 'utf8');
-});
-
-// Create jest.config.js.
-const jestConfig = `
-const func = require('@jupyterlab/testutils/lib/jest-config');
-module.exports = func('${name}', __dirname);
-`;
-fs.writeFileSync(path.join(testSrc, 'jest.config.js'), jestConfig, 'utf8');
-
 // Open coreutils package.json
 const coreUtils = path.resolve(__dirname, 'test-coreutils');
 const coreUtilsData = require('./test-coreutils/package.json');
 
 // Open target package.json
 const targetData = utils.readJSONFile(path.join(testSrc, 'package.json'));
+
+// Get package name
+const pkgName = targetData.name;
 
 // Assign scripts from coreutils
 targetData.scripts = coreUtilsData.scripts;
@@ -65,6 +46,28 @@ targetData.devDependencies = coreUtilsData.devDependencies;
 
 // Write out the package.json file.
 utils.writeJSONFile(path.join(testSrc, 'package.json'), targetData);
+
+// Update the test files
+glob.sync(path.join(testSrc, 'src', '**', '*.ts*')).forEach(function(filePath) {
+  console.log(filePath); // eslint-disable-line
+  // Convert test files to use jest
+  let src = fs.readFileSync(filePath, 'utf8');
+  src = src.split('before(').join('beforeAll(');
+  src = src.split('context(').join('describe(');
+  src = src.split('after(').join('afterAll(');
+
+  // Use imports from /src
+  src = src.split(`'${pkgName}';`).join(`'${pkgName}/src';`);
+
+  fs.writeFileSync(filePath, src, 'utf8');
+});
+
+// Create jest.config.js.
+const jestConfig = `
+const func = require('@jupyterlab/testutils/lib/jest-config');
+module.exports = func('${name}', __dirname);
+`;
+fs.writeFileSync(path.join(testSrc, 'jest.config.js'), jestConfig, 'utf8');
 
 // Update tsconfig to use jest types.
 const tsData = utils.readJSONFile(path.join(testSrc, 'tsconfig.json'));

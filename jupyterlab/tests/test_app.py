@@ -180,6 +180,9 @@ jest_aliases.update({
     'testPathPattern': 'JestApp.testPathPattern'
 })
 jest_aliases.update({
+    'pattern': 'JestApp.testPathPattern'
+})
+jest_aliases.update({
     'testNamePattern': 'JestApp.testNamePattern'
 })
 

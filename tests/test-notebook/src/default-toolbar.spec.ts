@@ -5,6 +5,8 @@ import { expect } from 'chai';
 
 import { simulate } from 'simulate-event';
 
+// import { shallow, mount, render } from 'enzyme';
+
 import { PromiseDelegate } from '@phosphor/coreutils';
 
 import { Widget } from '@phosphor/widgets';
@@ -31,8 +33,12 @@ import {
 const JUPYTER_CELL_MIME = 'application/vnd.jupyter.cells';
 
 describe('@jupyterlab/notebook', () => {
+  beforeAll(() => {
+    jest.setTimeout(60000); // Allow for slower CI
+  });
+
   describe('ToolbarItems', () => {
-    describe('noKernel', () => {
+    describe('@noKernel', () => {
       let context: Context<INotebookModel>;
       let panel: NotebookPanel;
 
@@ -225,7 +231,7 @@ describe('@jupyterlab/notebook', () => {
       });
     });
 
-    describe('kernelRequired', () => {
+    describe('@kernelRequired', () => {
       let context: Context<INotebookModel>;
       let panel: NotebookPanel;
 
@@ -268,7 +274,7 @@ describe('@jupyterlab/notebook', () => {
           await framePromise();
           simulate(button.node.firstChild as HTMLElement, 'mousedown');
           await p.promise;
-        }).timeout(30000); // Allow for slower CI
+        }); // This test may need a long timeout
 
         it("should have the `'jp-RunIcon'` class", async () => {
           const button = ToolbarItems.createRunButton(panel);

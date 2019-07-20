@@ -407,7 +407,7 @@ describe('@jupyterlab/notebook', () => {
       });
 
       describe('#handleEvent()', () => {
-        context('change', () => {
+        describe('change', () => {
           it('should update the metadata', () => {
             const select = tool.selectNode;
             simulate(select, 'focus');
@@ -419,7 +419,7 @@ describe('@jupyterlab/notebook', () => {
           });
         });
 
-        context('focus', () => {
+        describe('focus', () => {
           it('should add the focused class to the wrapper node', () => {
             const select = tool.selectNode;
             simulate(select, 'focus');
@@ -428,7 +428,7 @@ describe('@jupyterlab/notebook', () => {
           });
         });
 
-        context('blur', () => {
+        describe('blur', () => {
           it('should remove the focused class from the wrapper node', () => {
             const select = tool.selectNode;
             simulate(select, 'focus');
