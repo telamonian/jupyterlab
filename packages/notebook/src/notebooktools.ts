@@ -903,7 +903,15 @@ namespace Private {
   ): HTMLElement {
     let name = options.key;
     let title = options.title || name[0].toLocaleUpperCase() + name.slice(1);
-    let optionNodes: VirtualNode[] = [];
+    let defaultValue = JSON.stringify(options.default);
+
+    // tack the default (which is shown, but is not selectable by the user) onto the front
+    let optionNodes: VirtualNode[] = [
+      h.option(
+        { value: '', selected: '', disabled: '', hidden: '' },
+        defaultValue
+      )
+    ];
     for (let label in options.optionsMap) {
       let value = JSON.stringify(options.optionsMap[label]);
       optionNodes.push(h.option({ value }, label));

@@ -411,7 +411,7 @@ describe('@jupyterlab/notebook', () => {
           it('should update the metadata', () => {
             const select = tool.selectNode;
             simulate(select, 'focus');
-            select.selectedIndex = 1;
+            select.selectedIndex = 2;
             simulate(select, 'change');
             expect(tool.events).to.contain('change');
             const metadata = notebookTools.activeCell.model.metadata;
@@ -467,7 +467,7 @@ describe('@jupyterlab/notebook', () => {
         it('should update the metadata', () => {
           const select = tool.selectNode;
           simulate(select, 'focus');
-          select.selectedIndex = 1;
+          select.selectedIndex = 2;
           simulate(select, 'change');
           expect(tool.methods).to.contain('onValueChanged');
           const metadata = notebookTools.activeCell.model.metadata;
@@ -505,15 +505,33 @@ describe('@jupyterlab/notebook', () => {
         expect(tool).to.be.an.instanceof(NotebookTools.KeySelector);
         expect(tool.key).to.equal('slideshow');
         const select = tool.selectNode;
-        expect(select.value).to.equal('');
+        expect(JSON.parse(select.value)).to.equal('');
         const metadata = notebookTools.activeCell.model.metadata;
         expect(metadata.get('slideshow')).to.be.undefined;
         simulate(select, 'focus');
-        tool.selectNode.selectedIndex = 1;
+        tool.selectNode.selectedIndex = 2;
         simulate(select, 'change');
+        expect(select.value).to.equal('slide');
         expect(metadata.get('slideshow')).to.deep.equal({
           slide_type: 'slide'
         });
+      });
+
+      it('should handle a change to the active cell', () => {
+        const tool = NotebookTools.createSlideShowSelector();
+        tool.selectNode.selectedIndex = -1;
+        notebookTools.addItem({ tool });
+        simulate(panel0.node, 'focus');
+        tabpanel.currentIndex = 2;
+        const select = tool.selectNode;
+        simulate(select, 'focus');
+        tool.selectNode.selectedIndex = 2;
+        simulate(select, 'change');
+
+        notebookTools.addItem({ tool });
+        const widget = tracker.currentWidget;
+        widget.content.activeCellIndex++;
+        expect(select.value).to.equal('');
       });
     });
 
@@ -527,7 +545,7 @@ describe('@jupyterlab/notebook', () => {
           Markdown: 'text/markdown',
           Python: 'text/x-python'
         };
-        optionsMap.None = '-';
+        // optionsMap.None = '-';
         const tool = NotebookTools.createNBConvertSelector(optionsMap);
         tool.selectNode.selectedIndex = -1;
         notebookTools.addItem({ tool });
