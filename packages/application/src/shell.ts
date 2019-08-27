@@ -690,6 +690,26 @@ export class LabShell extends Widget implements JupyterFrontEnd.IShell {
   }
 
   /**
+   * Find a widget from id.
+   */
+  widgetById(id: string, area?: ILabShell.Area): Widget | undefined {
+    if (area) {
+      return find(this.widgets(area), value => value.id === id) || undefined;
+    }
+
+    for (let area of ['main', 'left', 'right', 'header', 'top', 'bottom']) {
+      const widget =
+        find(this.widgets(area as ILabShell.Area), value => value.id === id) ||
+        undefined;
+      if (widget) {
+        return widget;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
    * Handle `after-attach` messages for the application shell.
    */
   protected onAfterAttach(msg: Message): void {
@@ -1085,7 +1105,7 @@ namespace Private {
      * @param id - The widget's unique ID.
      */
     activate(id: string): void {
-      let widget = this._findWidgetByID(id);
+      let widget = this._findWidgetById(id);
       if (widget) {
         this._sideBar.currentTitle = widget.title;
         widget.activate();
@@ -1096,7 +1116,7 @@ namespace Private {
      * Test whether the sidebar has the given widget by id.
      */
     has(id: string): boolean {
-      return this._findWidgetByID(id) !== null;
+      return this._findWidgetById(id) !== null;
     }
 
     /**
@@ -1171,7 +1191,7 @@ namespace Private {
     /**
      * Find the widget with the given id, or `null`.
      */
-    private _findWidgetByID(id: string): Widget | null {
+    private _findWidgetById(id: string): Widget | null {
       let item = find(this._items, value => value.widget.id === id);
       return item ? item.widget : null;
     }

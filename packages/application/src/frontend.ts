@@ -146,6 +146,30 @@ export abstract class JupyterFrontEnd<
   }
 
   /**
+   * Similar to contextMenuHitTest, but will return the widget associated
+   * with a node, rather the node itself.
+   *
+   * @param test - a function that takes an `HTMLElement` and returns a
+   *   boolean for whether it is the element the requester is seeking.
+   *
+   * @returns a Widget or undefined, if none is found.
+   */
+  contextMenuWidgetHitTest(
+    test: (node: HTMLElement) => boolean
+  ): Widget | undefined {
+    const node = this.contextMenuHitTest(test);
+    if (!node) {
+      return undefined;
+    }
+
+    const id = node.dataset.id;
+    if (id) {
+      return this.shell.widgetById(node.dataset.id);
+    }
+    return undefined;
+  }
+
+  /**
    * A method invoked on a document `'contextmenu'` event.
    */
   protected evtContextMenu(event: MouseEvent): void {
@@ -249,6 +273,8 @@ export namespace JupyterFrontEnd {
      * @param area - Optional regions in the shell whose widgets are iterated.
      */
     widgets(area?: string): IIterator<Widget>;
+
+    widgetById?(id: string, area?: string): Widget | undefined;
   }
 
   /**

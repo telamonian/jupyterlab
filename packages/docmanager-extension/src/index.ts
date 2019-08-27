@@ -627,17 +627,9 @@ function addLabCommands(
 
   // Returns the doc widget associated with the most recent contextmenu event.
   const contextMenuWidget = (): Widget => {
-    const pathRe = /[Pp]ath:\s?(.*)\n?/;
     const test = (node: HTMLElement) =>
-      node['title'] && !!node['title'].match(pathRe);
-    const node = app.contextMenuHitTest(test);
-
-    if (!node) {
-      // Fall back to active doc widget if path cannot be obtained from event.
-      return labShell.currentWidget;
-    }
-    const pathMatch = node['title'].match(pathRe);
-    return docManager.findWidget(pathMatch[1], null);
+      node.dataset.type && node.dataset.type === 'document-title';
+    return app.contextMenuWidgetHitTest(test) || labShell.currentWidget;
   };
 
   // Returns `true` if the current widget has a document context.
