@@ -16,6 +16,7 @@ import * as utils from './utils';
 import {
   ensurePackage,
   ensureUiComponents,
+  ensureUiComponentsPure,
   IEnsurePackageOptions
 } from './ensure-package';
 
@@ -372,6 +373,16 @@ export async function ensureIntegrity(): Promise<boolean> {
   pkgMessages = await ensureUiComponents(pkgPaths['@jupyterlab/ui-components']);
   if (pkgMessages.length > 0) {
     let pkgName = '@jupyterlab/ui-components';
+    if (!messages[pkgName]) {
+      messages[pkgName] = [];
+    }
+    messages[pkgName] = messages[pkgName].concat(pkgMessages);
+  }
+  pkgMessages = await ensureUiComponentsPure(
+    pkgPaths['@jupyterlab/ui-components-pure']
+  );
+  if (pkgMessages.length > 0) {
+    let pkgName = '@jupyterlab/ui-components-pure';
     if (!messages[pkgName]) {
       messages[pkgName] = [];
     }

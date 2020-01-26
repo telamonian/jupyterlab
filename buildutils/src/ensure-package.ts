@@ -21,7 +21,8 @@ const HEADER_TEMPLATE = `
 `;
 
 const ICON_IMPORTS_TEMPLATE = `
-import { JLIcon } from './jlicon';
+// module level imports
+{{moduleImportStatements}}
 
 // icon svg import statements
 {{iconImportStatements}}
@@ -391,6 +392,7 @@ export async function ensureUiComponents(
       );
     }
   });
+  const moduleImportStatements = `import { JLIcon } from './jlicon';`;
   const iconImportStatements = _iconImportStatements.join('\n');
   const jliconConstruction = _jliconConstruction.join('\n');
 
@@ -398,7 +400,118 @@ export async function ensureUiComponents(
   const iconImportsPath = path.join(iconSrcDir, 'iconimports.ts');
   const iconImportsContents = utils.fromTemplate(
     HEADER_TEMPLATE + ICON_IMPORTS_TEMPLATE,
-    { funcName, iconImportStatements, jliconConstruction }
+    {
+      funcName,
+      moduleImportStatements,
+      iconImportStatements,
+      jliconConstruction
+    }
+  );
+  messages.push(...ensureFile(iconImportsPath, iconImportsContents, false));
+
+  /* support for deprecated icon CSS classes */
+  const iconCSSDir = path.join(pkgPath, 'style');
+
+  // build the per-icon import code
+  let _iconCSSUrls: string[] = [];
+  let _iconCSSDeclarations: string[] = [];
+  svgs.forEach(svg => {
+    const name = utils.stem(svg);
+    const urlName = 'jp-icon-' + name;
+    const className = 'jp-' + utils.camelCase(name, true) + 'Icon';
+
+    _iconCSSUrls.push(
+      `--${urlName}: url('${path
+        .relative(iconCSSDir, svg)
+        .split(path.sep)
+        .join('/')}');`
+    );
+    _iconCSSDeclarations.push(
+      `.${className} {background-image: var(--${urlName})}`
+    );
+  });
+  const iconCSSUrls = _iconCSSUrls.join('\n');
+  const iconCSSDeclarations = _iconCSSDeclarations.join('\n');
+
+  // generate the actual contents of the iconCSSClasses file
+  const iconCSSClassesPath = path.join(iconCSSDir, 'deprecated.css');
+  const iconCSSClassesContent = utils.fromTemplate(
+    HEADER_TEMPLATE + ICON_CSS_CLASSES_TEMPLATE,
+    { funcName, iconCSSUrls, iconCSSDeclarations }
+  );
+  messages.push(...ensureFile(iconCSSClassesPath, iconCSSClassesContent));
+
+  return messages;
+}
+
+/**
+ * An extra ensure function just for the @jupyterlab/ui-components-pure package.
+ * Ensures that the icon svg import statements are synced with the contents
+ * of ui-components-pure/style/icons.
+ *
+ * @param pkgPath - The path to the @jupyterlab/ui-components-pure package.
+ * @param dorequire - If true, use `require` function in place of `import`
+ *  statements when loading the icon svg files
+ *
+ * @returns A list of changes that were made to ensure the package.
+ */
+export async function ensureUiComponentsPure(
+  pkgPath: string,
+  dorequire: boolean = false
+): Promise<string[]> {
+  const funcName = 'ensureUiComponentsPure';
+  const pkgName = pkgPath.endsWith('-pure')
+    ? utils.stem(pkgPath).slice(0, -5)
+    : utils.stem(pkgPath);
+  let messages: string[] = [];
+
+  const svgs = glob.sync(path.join(pkgPath, 'style/icons', '**/*.svg'));
+
+  /* support for glob import of icon svgs */
+  const iconSrcDir = path.join(pkgPath, 'src/icon');
+
+  // build the per-icon import code
+  let _svgImportStatements: string[] = [];
+  let _iconLiterals: string[] = [];
+  svgs.forEach(svg => {
+    const name = utils.stem(svg);
+    const svgpath = path
+      .relative(iconSrcDir, svg)
+      .split(path.sep)
+      .join('/');
+
+    const svgstrRef = utils.camelCase(name) + 'Svg';
+    const iconRef = utils.camelCase(name) + 'Icon';
+    const qualName = [pkgName, utils.stem(svg)].join(':');
+
+    if (dorequire) {
+      // load the icon svg using `require`
+      _iconLiterals.push(
+        `export const ${iconRef} = { name: '${qualName}', svgstr: require('${svgpath}').default };`
+      );
+    } else {
+      // load the icon svg using `import`
+      _svgImportStatements.push(`import ${svgstrRef} from '${svgpath}';`);
+
+      _iconLiterals.push(
+        `export const ${iconRef} = { name: '${qualName}', svgstr: ${svgstrRef} };`
+      );
+    }
+  });
+  const moduleImportStatements = '';
+  const iconImportStatements = _svgImportStatements.join('\n');
+  const jliconConstruction = _iconLiterals.join('\n');
+
+  // generate the actual contents of the iconImports file
+  const iconImportsPath = path.join(iconSrcDir, 'iconimports.ts');
+  const iconImportsContents = utils.fromTemplate(
+    HEADER_TEMPLATE + ICON_IMPORTS_TEMPLATE,
+    {
+      funcName,
+      moduleImportStatements,
+      iconImportStatements,
+      jliconConstruction
+    }
   );
   messages.push(...ensureFile(iconImportsPath, iconImportsContents, false));
 

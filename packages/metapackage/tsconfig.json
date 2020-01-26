@@ -241,6 +241,9 @@
       "path": "../ui-components-extension"
     },
     {
+      "path": "../ui-components-pure"
+    },
+    {
       "path": "../vdom"
     },
     {

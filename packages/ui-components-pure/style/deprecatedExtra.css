@@ -1,0 +1,52 @@
+/*-----------------------------------------------------------------------------
+| Copyright (c) Jupyter Development Team.
+| Distributed under the terms of the Modified BSD License.
+|----------------------------------------------------------------------------*/
+
+/**
+ * (DEPRECATED) Support for consuming icons as CSS `background-image`
+ */
+
+:root {
+  --jp-icon-check-disabled: url('deprecated/check-disabled.svg');
+  --jp-icon-search-white: url('deprecated/search-white.svg');
+}
+
+.jp-MaterialIcon {
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.jp-Icon {
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+}
+
+.jp-Icon-16 {
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 16px;
+}
+
+.jp-Icon-18 {
+  min-width: 18px;
+  min-height: 18px;
+  background-size: 18px;
+}
+
+.jp-Icon-20 {
+  min-width: 20px;
+  min-height: 20px;
+  background-size: 20px;
+}
+
+.jp-DragIcon {
+  margin-right: 4px;
+}
