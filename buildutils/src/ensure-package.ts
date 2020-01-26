@@ -480,7 +480,7 @@ export async function ensureUiComponentsPure(
       .split(path.sep)
       .join('/');
 
-    const svgstrRef = utils.camelCase(name) + 'Svg';
+    const svgstrRef = utils.camelCase(name) + 'Svgstr';
     const iconRef = utils.camelCase(name) + 'Icon';
     const qualName = [pkgName, utils.stem(svg)].join(':');
 
