@@ -2,6 +2,10 @@ const puppeteer = require('puppeteer');
 const inspect = require('util').inspect;
 const URL = process.argv[2];
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function main() {
   /* eslint-disable no-console */
   console.info('Starting Chrome Headless');
@@ -37,6 +41,9 @@ async function main() {
   for (let error of errors) {
     console.error(`Parsed an error from text content: ${error.message}`, error);
   }
+
+  // wait to finalize any outstanding GET requests
+  await sleep(1000);
 
   await browser.close();
 
