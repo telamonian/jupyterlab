@@ -59,6 +59,7 @@
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx --fix .",
     "eslint:check": "eslint --ext .js,.jsx,.ts,.tsx .",
     "get:dependency": "node buildutils/lib/get-dependency.js",
+    "getver": "yarn --version",
     "postinstall": "node scripts/ensure-buildutils.js",
     "integrity": "node scripts/ensure-buildutils.js && node buildutils/lib/ensure-repo.js",
     "lighthouse": "lighthouse http://localhost:8888/ --chrome-flags='--headless' --emulated-form-factor=none --throttling-method=provided --only-categories performance",
