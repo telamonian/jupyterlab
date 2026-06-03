@@ -140,7 +140,7 @@ jobs:
           git config --global user.name 'galata-snapshots-bot'
           git config --global user.email '263663552+galata-snapshots-bot@users.noreply.github.com'
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           ref: refs/pull/${{ github.event.issue.number || github.event.pull_request.number }}/head
           fetch-depth: 1
@@ -158,7 +158,7 @@ jobs:
           find ./test-assets -type f -name "*.json" -o -name "*.png"
 
       - name: Get script for unpacking screenshots
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           # we fetch it from main to avoid running code from forks
           ref: ${{ github.event.repository.default_branch }}
@@ -248,7 +248,7 @@ jobs:
       pr-action: ${{ steps.open-pr.outputs.pr-action }}
     steps:
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           ref: ${{ needs.create-branch.outputs.branch-name }}
           repository: galata-snapshots-bot/${{ github.event.repository.name }}
